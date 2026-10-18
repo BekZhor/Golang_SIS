@@ -3,13 +3,12 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"github.com/BekZhor/Golang_SIS/taskservice"
 	"os"
-	"strconv"
 	"strings"
-	"unicode/utf8"
-	//"errors"
 )
 
+/*
 func ChooseInputService(text_input *string, digits_input *[]float64) {
 	var service_type int
 
@@ -78,56 +77,72 @@ func ChooseInputService(text_input *string, digits_input *[]float64) {
 		return
 	}
 }
+*/
+
+var reader = bufio.NewReader(os.Stdin)
+
+func readChoice() string {
+	fmt.Print("Choose an option: ")
+	input, _ := reader.ReadString('\n')
+	return strings.TrimSpace(input)
+}
 
 func main() {
-	fmt.Println("Text Processing - 1\nFinancial Calculation - 2")
+	textService := taskservice.TextService{}
+	digitService := taskservice.DigitService{}
 
-	var text_input string
-	var digits_input []float64
+	for {
+		fmt.Println("\n========== TASK MANAGEMENT ==========")
+		fmt.Println("1. Text tasks")
+		fmt.Println("2. Digit tasks")
+		fmt.Println("0. Exit")
+		fmt.Println("=====================================")
 
-	ChooseInputService(&text_input, &digits_input)
+		var service taskservice.TaskService
 
-
-	if text_input != "" {
-		fmt.Println("\n========== TEXT ANALYSIS ==========")
-		fmt.Printf("Value type: %T\n", text_input)
-		fmt.Printf("Original text: %s\n", text_input)
-		fmt.Printf("Character count: %d\n", utf8.RuneCountInString(text_input))
-		fmt.Printf("Word count: %d\n", len(strings.Fields(text_input)))
-		fmt.Printf("Byte size: %d\n", len(text_input))
-		fmt.Println("====================================")
-	}
-
-	if len(digits_input) > 0 {
-		fmt.Println("\n======= FINANCIAL DATA ANALYSIS =======")
-		fmt.Printf("Variable type: %T\n", digits_input)
-		fmt.Printf("Element type: %T\n", digits_input[0])
-		fmt.Printf("Input values: %v\n", digits_input)
-		fmt.Printf("Number of elements: %d\n", len(digits_input))
-		fmt.Printf("Slice capacity: %d\n", cap(digits_input))
-
-		var sum float64
-		min := digits_input[0]
-		max := digits_input[0]
-
-		for i, value := range digits_input {
-			fmt.Printf("Element [%d]: value = %v, type = %T\n", i, value, value)
-
-			sum += value
-
-			if value < min {
-				min = value
-			}
-			if value > max {
-				max = value
-			}
+		switch readChoice() {
+		case "1":
+			service = &textService
+		case "2":
+			service = &digitService
+		case "0":
+			fmt.Println("Application closed")
+			return
+		default:
+			fmt.Println("Invalid choice")
+			continue
 		}
 
-		fmt.Printf("Sum: %.2f\n", sum)
-		fmt.Printf("Average: %.2f\n", sum/float64(len(digits_input)))
-		fmt.Printf("Minimum: %.2f\n", min)
-		fmt.Printf("Maximum: %.2f\n", max)
-		fmt.Println("=======================================")
+		serviceMenu(service)
 	}
+}
 
+func serviceMenu(service taskservice.TaskService) {
+	for {
+		fmt.Println("\n========== TASK MENU ==========")
+		fmt.Println("1. Create task")
+		fmt.Println("2. List tasks")
+		fmt.Println("3. Search task")
+		fmt.Println("4. Remove task")
+		fmt.Println("5. Analyze task")
+		fmt.Println("0. Back")
+		fmt.Println("===============================")
+
+		switch readChoice() {
+		case "1":
+			service.CreateTask()
+		case "2":
+			service.ListTasks()
+		case "3":
+			service.SearchTask()
+		case "4":
+			service.RemoveTask()
+		case "5":
+			service.ApplyAnalyze()
+		case "0":
+			return
+		default:
+			fmt.Println("Invalid choice")
+		}
+	}
 }
